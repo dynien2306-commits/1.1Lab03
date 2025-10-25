@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Form Validator</title>
+    <style>
+        .form-container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 30px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+        }
+
+        input.valid { border-color: #28a745; }
+        input.invalid { border-color: #dc3545; }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .error-message.show { display: block; }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 12px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="form-container">
+        <h2>Sign Up Form</h2>
+        <form id="signupForm">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" placeholder="Enter username">
+                <div class="error-message" id="usernameError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="Enter email">
+                <div class="error-message" id="emailError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter password">
+                <div class="error-message" id="passwordError"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" placeholder="Confirm password">
+                <div class="error-message" id="confirmPasswordError"></div>
+            </div>
+
+            <button type="submit" id="submitBtn" disabled>Sign Up</button>
+        </form>
+    </div>
+
+    <!-- ⬇️ JavaScript (phần xử lý logic) nằm cuối <body> -->
+    <script>
+        function validateUsername(username) {
+            const regex = /^[a-zA-Z0-9]{4,20}$/;
+            return regex.test(username);
+        }
+
+        function validateEmail(email) {
+            const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return regex.test(email);
+        }
+
+        function validatePassword(password) {
+            const regex = /^(?=.*[A-Z])(?=.*\d).{8,}$/;
+            return regex.test(password);
+        }
+
+        function validatePasswordMatch(pass1, pass2) {
+            return pass1 === pass2 && pass1 !== "";
+        }
+
+        function showError(inputId, message) {
+            const input = document.getElementById(inputId);
+            const error = document.getElementById(inputId + "Error");
+            input.classList.add("invalid");
+            input.classList.remove("valid");
+            error.textContent = message;
+            error.classList.add("show");
+        }
+
+        function clearError(inputId) {
+            const input = document.getElementById(inputId);
+            const error = document.getElementById(inputId + "Error");
+            input.classList.remove("invalid");
+            input.classList.add("valid");
+            error.classList.remove("show");
+        }
+
+        function validateForm() {
+            const username = document.getElementById("username").value.trim();
+            const email = document.getElementById("email").value.trim();
+            const password = document.getElementById("password").value.trim();
+            const confirmPassword = document.getElementById("confirmPassword").value.trim();
+            const submitBtn = document.getElementById("submitBtn");
+
+            let valid = true;
+
+            if (!validateUsername(username)) {
+                showError("username", "Username must be 4-20 characters (letters or numbers).");
+                valid = false;
+            } else {
+                clearError("username");
+            }
+
+            if (!validateEmail(email)) {
+                showError("email", "Please enter a valid email address.");
+                valid = false;
+            } else {
+                clearError("email");
+            }
+
+            if (!validatePassword(password)) {
+                showError("password", "Password must be ≥8 chars, 1 uppercase, 1 number.");
+                valid = false;
+            } else {
+                clearError("password");
+            }
+
+            if (!validatePasswordMatch(password, confirmPassword)) {
+                showError("confirmPassword", "Passwords do not match.");
+                valid = false;
+            } else {
+                clearError("confirmPassword");
+            }
+
+            submitBtn.disabled = !valid;
+        }
+
+        const inputs = document.querySelectorAll("input");
+        inputs.forEach(input => {
+            input.addEventListener("input", validateForm);
+        });
+
+        document.getElementById("signupForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+            alert("Form submitted successfully!");
+        });
+    </script>
+</body>
+</html>
